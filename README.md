@@ -43,6 +43,10 @@ bb forget 2026-06-27-keap1-nrf2-axis
 | `bb remember <text>` | Write a new memory node to `bb-wiki/<section>/<id>.md` |
 | `bb recall <query>` | Keyword search across all nodes; score = title×3 + tags×2 + body×1 |
 | `bb forget <id>` | Remove a node + update `index.md` + append to `log.md` (audit trail) |
+| `bb ticket` | List the 16-ticket QA taxonomy (OpenDraft back-port, MIT) |
+| `bb ticket <id>` | Heuristic ticket inspection of a bb-wiki node |
+| `bb review <id>` | Advisory QA pass — OpenDraft Thread/Narrator style (always exits 0) |
+| `bb gate <id>` | Blocking QA pass — OpenDraft Citation-Compiler style (exit 1 on fail) |
 
 ## bb-wiki integration
 
@@ -75,8 +79,30 @@ export WIKI_ROOT=/path/to/bb-wiki
 ## Roadmap
 
 - **v0.2.0** — `bb improve <id>`: LLM-assisted promotion of a raw note to a proper concept/entity page with filled 4-섹션 judgment layer. Opt-out via `BB_NO_LLM=1`.
+- **v0.2.0** — `bb ticket`, `bb review`, `bb gate`: 16-ticket QA taxonomy (TICKET-001..016) back-ported from [OpenDraft](https://github.com/federicodeponte/opendraft) (MIT). 5-phase pipeline (research → structure → compose → qa → export). 10 blocking + 6 advisory tickets. Heuristics-only, no LLM cost.
 - **v0.3.0** — `bb` subcommands for PRISM, agent-skill-pack, and other BB ops (wiki lint, ingest).
 - **v0.4.0** — Optional SQLite + FTS5 backend for sub-millisecond recall on large wikis (default stays markdown-only).
+
+### Ticket example
+
+```bash
+# List the 16-ticket taxonomy (grouped by 5-phase pipeline)
+bb ticket
+
+# Inspect a specific node — runs heuristics per ticket
+bb ticket 2026-06-29-opendraft-back-port
+
+# Filter to one phase
+bb ticket --phase compose
+
+# Advisory QA pass (always exits 0 — never blocks)
+bb review 2026-06-29-opendraft-back-port
+
+# Blocking QA pass (exit 1 on any blocking fail — use pre-publish / CI)
+bb gate 2026-06-29-opendraft-back-port
+```
+
+Tickets source-of-truth: `bb/data/bb_qa_tickets.py`. Back-port notes: `~/.hermes/reads/opendraft/SYNTHESIS.md`.
 
 ## License
 
